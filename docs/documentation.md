@@ -1,134 +1,134 @@
 # Azure App Service Deployment
 
-This document describes the setup and configuration of Azure resources using Azure CLI scripts.
+## Overview
 
-## 1. Create App Service
+The purpose of this project was to create and configure a complete Azure environment using Azure CLI scripts. The goal was to deploy a web application with monitoring, security, storage, and database support.
 
-An Azure App Service was created using Azure CLI.
-
-**Script:**
-
-- `scripts/appservice.sh`
-
-**Description:**
-This script creates the required resources for hosting the application:
-
-- Resource Group
-- App Service Plan
-- Web App
-
-**Example command:**
-
-```bash
-az group create --name myResourceGroup --location westeurope
-```
+All resources were created using scripts to ensure repeatability and automation.
 
 ---
 
-## 2. Application Insights
+## Creating the App Service
 
-Application Insights was enabled to collect logs and monitor the application.
+To host the application, an Azure App Service was created.
 
-**Script:**
+This was done using a script that:
 
-- `scripts/appinsightconnection.sh`
+- Created an App Service Plan
+- Created a Web App
+- Enabled HTTPS to secure communication
 
-**Usage:**
-
-- Logs can be viewed in Azure Portal
-- Live Metrics can be used to monitor performance
-- Log queries (KQL) can be used to analyze errors
-
-This allows monitoring of application health and performance.
+The App Service is the central component where the application runs.
 
 ---
 
-## 3. Security
+## Monitoring with Application Insights
 
-Basic security measures were implemented.
+To monitor the application, Application Insights was configured.
 
-**Scripts:**
+This allows:
 
-- `scripts/security.sh`
-- `scripts/backup.sh`
+- Viewing logs in real time
+- Monitoring performance
+- Detecting errors
 
-**Implemented security:**
-
-- HTTPS is enabled
-- IP restrictions are configured
-- Daily backups are scheduled
-
-These measures help secure the application and ensure recovery if needed.
+The script creates the resource and connects it to the Web App by adding a connection string.
 
 ---
 
-## 4. Storage Account
+## Storage Account
 
-A Storage Account was created to manage files and logs.
+A Storage Account was created to store files and logs.
 
-**Script:**
+This is useful for:
 
-- `scripts/storage.sh`
+- Backups
+- Static files
+- Log storage
 
-This allows storage of static resources and log data.
-
----
-
-## 5. Key Vault
-
-Azure Key Vault was used to store sensitive information securely.
-
-**Script:**
-
-- `scripts/key.sh`
-
-**Implementation:**
-
-- Secrets such as connection strings are stored in Key Vault
-- Managed Identity is used for secure access
-
-This prevents sensitive data from being exposed in code.
+The script creates the storage account and a container for storing data.
 
 ---
 
-## 6. Database & Firewall
+## Database and Firewall
 
-An Azure SQL Database and firewall rules were configured.
+A SQL database was created to store application data.
 
-**Script:**
+To make it secure:
 
-- `scripts/sqldb-firewall.sh`
+- Firewall rules were added to allow only trusted access
+- Access was restricted to Azure services and the current IP address
 
-**Description:**
-
-- A SQL database was created
-- Firewall rules were configured to allow secure access
+This ensures that the database is protected from unauthorized access.
 
 ---
 
-## 7. Scaling
+## Key Vault and Secrets Management
+
+To securely manage sensitive data, Azure Key Vault was used.
+
+Instead of storing connection strings in code:
+
+- The connection string is stored as a secret in Key Vault
+- The Web App accesses it using Managed Identity
+
+This improves security and prevents exposure of sensitive information.
+
+---
+
+## Security Configuration
+
+Additional security was implemented for the Web App.
+
+Access restrictions were configured so that:
+
+- Only the current IP address is allowed
+- All other traffic is denied
+
+This reduces the attack surface of the application.
+
+---
+
+## Backup Configuration
+
+To ensure reliability, daily backups were configured.
+
+The backup process:
+
+- Stores backups in a Storage Account
+- Runs automatically every day
+- Keeps backups for a limited time
+
+This allows recovery in case of failure.
+
+---
+
+## Scaling
 
 Scaling was not implemented.
 
-**Reason:**
-The selected pricing tier did not support autoscaling, or issues occurred during configuration.
+This is because the selected pricing tier did not support autoscaling, or issues occurred during configuration.
 
 ---
 
-## 8. Deployment (Not Implemented Yet)
+## Deployment (Not Implemented Yet)
 
 Deployment using GitHub Actions will be implemented later.
 
-This step is required to automate deployment to Azure App Service.
+The goal is to automate deployment so that changes are automatically published when code is pushed to GitHub.
 
-## Execution Order
+---
 
-The scripts should be executed in the following order:
+## Conclusion
 
-1. appservice.sh
-2. storage.sh
-3. sqldb-firewall.sh
-4. key.sh
-5. appinsightconnection.sh
-6. security.sh
-7. backup.sh
+This project demonstrates how to build a complete Azure environment using scripts.
+
+The solution includes:
+
+- Hosting (App Service)
+- Monitoring (Application Insights)
+- Security (IP restrictions, HTTPS, Key Vault)
+- Data storage (SQL Database and Storage Account)
+- Backup and recovery
+
+All components are connected to create a secure and maintainable cloud solution.

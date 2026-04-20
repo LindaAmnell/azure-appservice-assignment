@@ -2,9 +2,25 @@
 
 ## Overview
 
-The purpose of this project was to create and configure a complete Azure environment using Azure CLI scripts. The goal was to deploy a web application with monitoring, security, storage, and database support.
+The purpose of this project was to create and configure a complete Azure environment using Azure CLI scripts. The goal was to build a web application environment with monitoring, security, storage, and database support.
+
+This document explains how each Azure resource was created and configured using scripts.
 
 All resources were created using scripts to ensure repeatability and automation.
+
+---
+
+## Execution Order
+
+The scripts should be executed in the following order:
+
+1. appservice.sh
+2. storage.sh
+3. sqldb-firewall.sh
+4. key.sh
+5. appinsightconnection.sh
+6. security.sh
+7. backup.sh
 
 ---
 
@@ -12,27 +28,61 @@ All resources were created using scripts to ensure repeatability and automation.
 
 To host the application, an Azure App Service was created.
 
-This was done using a script that:
+Script:
 
-- Created an App Service Plan
-- Created a Web App
-- Enabled HTTPS to secure communication
+- `scripts/appservice.sh`
 
-The App Service is the central component where the application runs.
+Run the script:
+
+```bash
+./scripts/appservice.sh myapp mygroup westeurope
+```
+
+Parameters:
+
+- `myapp` – name of the Web App (must be unique)
+- `mygroup` – Resource Group name
+- `westeurope` – Azure region
+
+The script performs the following:
+
+- Creates an App Service Plan
+- Creates a Web App
+- Enables HTTPS
+- Sets a startup command
+
+The App Service is the main component where the application runs.
 
 ---
 
 ## Monitoring with Application Insights
 
-To monitor the application, Application Insights was configured.
+Application Insights was configured to monitor the application.
 
-This allows:
+Script:
 
-- Viewing logs in real time
-- Monitoring performance
-- Detecting errors
+- `scripts/appinsightconnection.sh`
 
-The script creates the resource and connects it to the Web App by adding a connection string.
+Run the script:
+
+```bash
+./scripts/appinsightconnection.sh appinsights mygroup westeurope myapp
+```
+
+Parameters:
+
+- `appinsights` – name of Application Insights resource
+- `mygroup` – Resource Group name
+- `westeurope` – Azure region
+- `myapp` – Web App name
+
+The script performs the following:
+
+- Creates Application Insights
+- Retrieves the connection string
+- Connects it to the Web App
+
+This allows monitoring of logs, performance, and errors.
 
 ---
 
@@ -40,13 +90,27 @@ The script creates the resource and connects it to the Web App by adding a conne
 
 A Storage Account was created to store files and logs.
 
-This is useful for:
+Script:
 
-- Backups
-- Static files
-- Log storage
+- `scripts/storage.sh`
 
-The script creates the storage account and a container for storing data.
+Run the script:
+
+```bash
+./scripts/storage.sh mystorage mygroup westeurope
+```
+
+Parameters:
+
+- `mystorage` – Storage Account name (must be globally unique)
+- `mygroup` – Resource Group name
+- `westeurope` – Azure region
+
+The script performs the following:
+
+- Creates a Storage Account
+- Retrieves access keys
+- Creates a container for static files
 
 ---
 
@@ -54,81 +118,154 @@ The script creates the storage account and a container for storing data.
 
 A SQL database was created to store application data.
 
-To make it secure:
+Script:
 
-- Firewall rules were added to allow only trusted access
-- Access was restricted to Azure services and the current IP address
+- `scripts/sqldb-firewall.sh`
 
-This ensures that the database is protected from unauthorized access.
+Run the script:
+
+```bash
+./scripts/sqldb-firewall.sh myserver mydb mygroup westeurope adminuser
+```
+
+Parameters:
+
+- `myserver` – SQL Server name
+- `mydb` – Database name
+- `mygroup` – Resource Group name
+- `westeurope` – Azure region
+- `adminuser` – SQL admin username
+
+The script performs the following:
+
+- Creates a SQL Server
+- Creates a database
+- Configures firewall rules for Azure services and the current IP
 
 ---
 
 ## Key Vault and Secrets Management
 
-To securely manage sensitive data, Azure Key Vault was used.
+Azure Key Vault was used to store sensitive information securely.
 
-Instead of storing connection strings in code:
+Script:
 
-- The connection string is stored as a secret in Key Vault
-- The Web App accesses it using Managed Identity
+- `scripts/key.sh`
 
-This improves security and prevents exposure of sensitive information.
+Run the script:
+
+```bash
+./scripts/key.sh myvault mygroup westeurope myapp myserver mydb adminuser subscription-id
+```
+
+Parameters:
+
+- `myvault` – Key Vault name
+- `mygroup` – Resource Group name
+- `westeurope` – Azure region
+- `myapp` – Web App name
+- `myserver` – SQL Server name
+- `mydb` – Database name
+- `adminuser` – SQL admin username
+- `subscription-id` – Azure subscription ID
+
+The script performs the following:
+
+- Creates a Key Vault
+- Stores the database connection string
+- Enables Managed Identity
+- Grants access to Key Vault
+- Connects the secret to the Web App
 
 ---
 
 ## Security Configuration
 
-Additional security was implemented for the Web App.
+Access restrictions were configured to improve security.
 
-Access restrictions were configured so that:
+Script:
 
-- Only the current IP address is allowed
-- All other traffic is denied
+- `scripts/security.sh`
 
-This reduces the attack surface of the application.
+Run the script:
+
+```bash
+./scripts/security.sh myapp mygroup
+```
+
+Parameters:
+
+- `myapp` – Web App name
+- `mygroup` – Resource Group name
+
+The script performs the following:
+
+- Retrieves your public IP address
+- Allows access only from that IP
+- Blocks all other traffic
 
 ---
 
 ## Backup Configuration
 
-To ensure reliability, daily backups were configured.
+Daily backups were configured for the Web App.
 
-The backup process:
+Script:
 
-- Stores backups in a Storage Account
-- Runs automatically every day
-- Keeps backups for a limited time
+- `scripts/backup.sh`
 
-This allows recovery in case of failure.
+Run the script:
+
+```bash
+./scripts/backup.sh myapp mygroup mystorage
+```
+
+Parameters:
+
+- `myapp` – Web App name
+- `mygroup` – Resource Group name
+- `mystorage` – Storage Account name
+
+The script performs the following:
+
+- Creates a backup container
+- Generates a SAS token
+- Configures daily backups
+- Sets retention rules
 
 ---
 
-## Scaling
+## Verification
 
-Scaling was not implemented.
+The resources were tested after creation to ensure they work correctly.
 
-This is because the selected pricing tier did not support autoscaling, or issues occurred during configuration.
+- The App Service was successfully created and accessible
+- Application Insights collects logs
+- Database connection was configured
+- Security rules were applied correctly
 
----
-
-## Deployment (Not Implemented Yet)
-
-Deployment using GitHub Actions will be implemented later.
-
-The goal is to automate deployment so that changes are automatically published when code is pushed to GitHub.
+This confirms that the environment is functioning as expected.
 
 ---
 
 ## Conclusion
 
-This project demonstrates how to build a complete Azure environment using scripts.
+This project demonstrates how to build a complete Azure environment using CLI scripts.
 
 The solution includes:
 
-- Hosting (App Service)
-- Monitoring (Application Insights)
-- Security (IP restrictions, HTTPS, Key Vault)
-- Data storage (SQL Database and Storage Account)
-- Backup and recovery
+- App Service for hosting
+- Application Insights for monitoring
+- Storage Account for files
+- SQL Database for data
+- Key Vault for secrets
+- Security configurations
+- Backup system
 
 All components are connected to create a secure and maintainable cloud solution.
+
+## Deployment (Not Implemented Yet)
+
+Deployment using GitHub Actions is planned but not yet implemented.
+
+---

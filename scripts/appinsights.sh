@@ -6,10 +6,7 @@ RESOURCE_GROUP=$2
 LOCATION=$3
 WEBAPP_NAME=$4
 
-if [ -z "$APPINSIGHTS_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$LOCATION" ] || [ -z "$WEBAPP_NAME" ]; then
-  echo "Usage: ./create-appinsights.sh <appinsights-name> <resource-group> <location> <webapp-name>"
-  exit 1
-fi
+
 
 echo "Creating Application Insights..."
 az monitor app-insights component create \

@@ -5,10 +5,6 @@ WEBAPP_NAME=$1
 RESOURCE_GROUP=$2
 STORAGE_NAME=$3
 
-if [ -z "$WEBAPP_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$STORAGE_NAME" ]; then
-  echo "Usage: ./backup.sh <webapp-name> <resource-group> <storage-account-name>"
-  exit 1
-fi
 
 CONTAINER_NAME="appservicebackup"
 

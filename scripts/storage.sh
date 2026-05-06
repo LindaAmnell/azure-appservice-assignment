@@ -5,11 +5,6 @@ STORAGE_NAME=$1
 RESOURCE_GROUP=$2
 LOCATION=$3
 
-if [ -z "$STORAGE_NAME" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$LOCATION" ]; then
-  echo "Usage: ./create-storage.sh <storage-name> <resource-group> <location>"
-  exit 1
-fi
-
 echo "Creating Storage Account..."
 az storage account create \
   --name "$STORAGE_NAME" \
@@ -36,4 +31,16 @@ az storage container create \
   --account-name "$STORAGE_NAME" \
   --account-key "$STORAGE_KEY"
 
-echo "Done! Storage Account created."
+echo "Creating test file..."
+echo "This file is stored in Azure Storage" > testfile.txt
+
+echo "Uploading test file..."
+az storage blob upload \
+  --account-name "$STORAGE_NAME" \
+  --account-key "$STORAGE_KEY" \
+  --container-name static-files \
+  --name testfile.txt \
+  --file testfile.txt \
+  --overwrite true
+
+echo "Done! Storage Account created and test file uploaded."

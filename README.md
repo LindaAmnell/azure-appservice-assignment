@@ -169,19 +169,4 @@ bash backup.sh myapp my-rg mystorage
 
 ---
 
-# 🚧 Future Improvements
-
-* GitHub Actions CI/CD
-* Terraform or Bicep
-* Private Endpoints
-* Monitoring Alerts
-
----
-
-# 👨‍💻 Author
-
-Created as an Azure infrastructure automation project using Azure CLI and Bash scripting.
-
----
-
 ⭐ Feel free to fork the project, improve it, or use it as inspiration for your own Azure deployments.
